@@ -736,7 +736,8 @@ public:
 	bool LoadRegistry();
 	bool SaveRegistry();
 	bool SetNV(const CString & sName, const CString & sValue, bool bWriteToDisk = true);
-	CString GetNV(const CString & sName);
+	bool HasNV(const CString & sName);
+	CString GetNV(const CString & sName, const CString & sDefault = "");
 	bool DelNV(const CString & sName, bool bWriteToDisk = true);
 	MCString::iterator FindNV(const CString & sName) { return m_mssRegistry.find(sName); }
 	MCString::iterator EndNV() { return m_mssRegistry.end(); }

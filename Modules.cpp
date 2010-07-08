@@ -165,14 +165,24 @@ bool CModule::SetNV(const CString & sName, const CString & sValue, bool bWriteTo
 	return true;
 }
 
-CString CModule::GetNV(const CString & sName) {
+bool CModule::HasNV(const CString & sName) {
+	MCString::iterator it = m_mssRegistry.find(sName);
+
+	if (it != m_mssRegistry.end()) {
+		return true;
+	}
+
+	return false;
+}
+
+CString CModule::GetNV(const CString & sName, const CString & sDefault) {
 	MCString::iterator it = m_mssRegistry.find(sName);
 
 	if (it != m_mssRegistry.end()) {
 		return it->second;
 	}
 
-	return "";
+	return sDefault;
 }
 
 bool CModule::DelNV(const CString & sName, bool bWriteToDisk) {
