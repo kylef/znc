@@ -1013,6 +1013,18 @@ void CClient::UserCommand(CString& sLine) {
 	} else if (m_pUser->IsAdmin() &&
 			(sCommand.Equals("LISTPORTS") || sCommand.Equals("ADDPORT") || sCommand.Equals("DELPORT"))) {
 		UserPortCommand(sLine);
+	} else if (m_pUser->IsAdmin() && sCommand.Equals("DEBUG")) {
+		close(1);
+
+		if (CUtils::Debug()) {
+			open("/dev/null", O_WRONLY);
+			PutStatus("Debug off");
+		} else {
+			open((CZNC::Get().GetZNCPath() + "/log.txt").c_str(), O_WRONLY | O_CREAT, S_IREAD | S_IWRITE);
+			PutStatus("Debug on");
+		}
+
+		CUtils::SetDebug(!CUtils::Debug());
 	} else {
 		PutStatus("Unknown command [" + sCommand + "] try 'Help'");
 	}
@@ -1353,6 +1365,10 @@ void CClient::HelpUser() {
 		Table.SetCell("Command", "Restart");
 		Table.SetCell("Arguments", "[message]");
 		Table.SetCell("Description", "Restart ZNC");
+
+		Table.AddRow();
+		Table.SetCell("Command", "Debug");
+		Table.SetCell("Description", "Toggle debugging");
 	}
 
 	PutStatus(Table);
