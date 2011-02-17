@@ -138,6 +138,42 @@ bool CUser::UpdateModule(const CString &sModule) {
 	return !error;
 }
 
+const set<CString>& CUser::GetPermissions() const { return m_ssPermissions; }
+
+bool CUser::HasPermission(const CString& sPermission) const {
+	if ((sPermission.length() == 0) || IsAdmin()) {
+		return true;
+	}
+
+	for (set<CString>::const_iterator it = m_ssPermissions.begin(); it != m_ssPermissions.end(); ++it) {
+		if (sPermission.AsLower().WildCmp(*it)) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+void CUser::Permit(const CString& sPermission) {
+	m_ssPermissions.insert(sPermission);
+}
+
+unsigned int CUser::Revoke(const CString& sPermission) {
+	list<CString> toDelete;
+
+	for (set<CString>::const_iterator it = m_ssPermissions.begin(); it != m_ssPermissions.end(); ++it) {
+		if ((*it).WildCmp(sPermission)) {
+			toDelete.push_front(*it);
+		}
+	}
+
+	for (list<CString>::iterator it2 = toDelete.begin(); it2 != toDelete.end(); ++it2) {
+		m_ssPermissions.erase(*it2);
+	}
+
+	return toDelete.size();
+}
+
 void CUser::DelClients() {
 	for (unsigned int c = 0; c < m_vClients.size(); c++) {
 		CClient* pClient = m_vClients[c];
@@ -369,6 +405,14 @@ bool CUser::Clone(const CUser& User, CString& sErrorRet, bool bCloneChans) {
 	SetBufferCount(User.GetBufferCount(), true);
 	SetJoinTries(User.JoinTries());
 	SetMaxJoins(User.MaxJoins());
+
+	// Permissions
+	m_ssPermissions.clear();
+	const set<CString>& ssPermissions = User.GetPermissions();
+	for (set<CString>::const_iterator it = ssPermissions.begin(); it != ssPermissions.end(); ++it) {
+		Permit(*it);
+	}
+	// !Permissions
 
 	// Allowed Hosts
 	m_ssAllowedHosts.clear();
@@ -679,6 +723,15 @@ bool CUser::WriteConfig(CFile& File) {
 	if (!m_ssAllowedHosts.empty()) {
 		for (set<CString>::iterator it = m_ssAllowedHosts.begin(); it != m_ssAllowedHosts.end(); ++it) {
 			PrintLine(File, "Allow", *it);
+		}
+
+		File.Write("\n");
+	}
+
+	// Permissions
+	if (!m_ssPermissions.empty()) {
+		for (set<CString>::const_iterator it = m_ssPermissions.begin(); it != m_ssPermissions.end(); ++it) {
+			PrintLine(File, "Permit", *it);
 		}
 
 		File.Write("\n");

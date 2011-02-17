@@ -1409,6 +1409,9 @@ bool CZNC::DoRehash(CString& sError)
 					} else if (sName.Equals("Allow")) {
 						pUser->AddAllowedHost(sValue);
 						continue;
+					} else if (sName.Equals("Permit")) {
+						pUser->Permit(sValue);
+						continue;
 					} else if (sName.Equals("Server")) {
 						CUtils::PrintAction("Adding Server [" + sValue + "]");
 						CUtils::PrintStatus(pUser->AddServer(sValue));

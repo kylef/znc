@@ -80,6 +80,12 @@ public:
 	CModules& GetModules() { return *m_pModules; }
 	const CModules& GetModules() const { return *m_pModules; }
 	// !Modules
+ 
+	// Permissions
+	bool HasPermission(const CString& sPermission) const;
+	void Permit(const CString& sPermission);
+	unsigned int Revoke(const CString& sPermission);
+	// !Permissions
 
 	// Buffers
 	void AddRawBuffer(const CString& sPre, const CString& sPost, bool bIncNick = true) { m_RawBuffer.AddLine(sPre, sPost, bIncNick); }
@@ -188,6 +194,7 @@ public:
 	eHashType GetPassHashType() const;
 	const CString& GetPassSalt() const;
 	const set<CString>& GetAllowedHosts() const;
+	const set<CString>& GetPermissions() const;
 	const CString& GetTimestampFormat() const;
 	bool GetTimestampAppend() const;
 	bool GetTimestampPrepend() const;
@@ -281,6 +288,7 @@ protected:
 	set<CDCCBounce*>      m_sDCCBounces;
 	set<CDCCSock*>        m_sDCCSocks;
 	set<CString>          m_ssAllowedHosts;
+	set<CString>          m_ssPermissions;
 	unsigned int          m_uServerIdx; ///< Index in m_vServers of our current server + 1
 	unsigned int          m_uBufferCount;
 	unsigned long long    m_uBytesRead;
