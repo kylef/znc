@@ -395,9 +395,9 @@ bool CModule::AddCommand(const CModCommand& Command)
 	return true;
 }
 
-bool CModule::AddCommand(const CString& sCmd, CModCommand::ModCmdFunc func, const CString& sArgs, const CString& sDesc)
+bool CModule::AddCommand(const CString& sCmd, CModCommand::ModCmdFunc func, const CString& sArgs, const CString& sDesc, const CString& sPermission)
 {
-	CModCommand cmd(sCmd, func, sArgs, sDesc);
+	CModCommand cmd(sCmd, func, sArgs, sDesc, sPermission);
 	return AddCommand(cmd);
 }
 
@@ -427,7 +427,12 @@ bool CModule::HandleCommand(const CString& sLine) {
 	const CModCommand* pCmd = FindCommand(sCmd);
 
 	if (pCmd) {
-		pCmd->Call(this, sLine);
+		if (pCmd->HasPermission(m_pUser)) {
+			pCmd->Call(this, sLine);
+		} else {
+			PutModule("Permission denied");
+		}
+
 		return true;
 	}
 
@@ -441,8 +446,11 @@ void CModule::HandleHelpCommand(const CString& sLine) {
 	map<CString, CModCommand>::const_iterator it;
 
 	CModCommand::InitHelp(Table);
-	for (it = m_mCommands.begin(); it != m_mCommands.end(); ++it)
-		it->second.AddHelp(Table);
+	for (it = m_mCommands.begin(); it != m_mCommands.end(); ++it) {
+		if (it->second.HasPermission(m_pUser)) {
+			it->second.AddHelp(Table);
+		}
+	}
 	PutModule(Table);
 }
 
@@ -1156,17 +1164,17 @@ ModHandle CModules::OpenModule(const CString& sModule, const CString& sModPath, 
 }
 
 CModCommand::CModCommand()
-	: m_sCmd(), m_pFunc(NULL), m_sArgs(), m_sDesc()
+	: m_sCmd(), m_pFunc(NULL), m_sArgs(), m_sDesc(), m_sPermission()
 {
 }
 
-CModCommand::CModCommand(const CString& sCmd, ModCmdFunc func, const CString& sArgs, const CString& sDesc)
-	: m_sCmd(sCmd), m_pFunc(func), m_sArgs(sArgs), m_sDesc(sDesc)
+CModCommand::CModCommand(const CString& sCmd, ModCmdFunc func, const CString& sArgs, const CString& sDesc, const CString& sPermission)
+	: m_sCmd(sCmd), m_pFunc(func), m_sArgs(sArgs), m_sDesc(sDesc), m_sPermission(sPermission)
 {
 }
 
 CModCommand::CModCommand(const CModCommand& other)
-	: m_sCmd(other.m_sCmd), m_pFunc(other.m_pFunc), m_sArgs(other.m_sArgs), m_sDesc(other.m_sDesc)
+	: m_sCmd(other.m_sCmd), m_pFunc(other.m_pFunc), m_sArgs(other.m_sArgs), m_sDesc(other.m_sDesc), m_sPermission(other.m_sPermission)
 {
 }
 
@@ -1176,6 +1184,7 @@ CModCommand& CModCommand::operator=(const CModCommand& other)
 	m_pFunc = other.m_pFunc;
 	m_sArgs = other.m_sArgs;
 	m_sDesc = other.m_sDesc;
+	m_sPermission = other.m_sPermission;
 	return *this;
 }
 
@@ -1190,4 +1199,8 @@ void CModCommand::AddHelp(CTable& Table) const {
 	Table.SetCell("Command", GetCommand());
 	Table.SetCell("Arguments", GetArgs());
 	Table.SetCell("Description", GetDescription());
+}
+
+bool CModCommand::HasPermission(const CUser *pUser) const {
+	return pUser->HasPermission(m_sPermission);
 }

@@ -214,8 +214,9 @@ public:
 	 * @param func The command's callback function.
 	 * @param sArgs Help text describing the arguments to this command.
 	 * @param sDesc Help text describing what this command does.
+	 * @param sPermission Permission required to execute this command.
 	 */
-	CModCommand(const CString& sCmd, ModCmdFunc func, const CString& sArgs, const CString& sDesc);
+	CModCommand(const CString& sCmd, ModCmdFunc func, const CString& sArgs, const CString& sDesc, const CString& sPermission);
 
 	/** Copy constructor, needed so that this can be saved in a std::map.
 	 * @param other Object to copy from.
@@ -242,6 +243,8 @@ public:
 	ModCmdFunc GetFunction() const { return m_pFunc; }
 	const CString& GetArgs() const { return m_sArgs; }
 	const CString& GetDescription() const { return m_sDesc; }
+	const CString& GetPermission() const { return m_sPermission; }
+	bool HasPermission(const CUser *pUser) const;
 
 	void Call(CModule *pMod, const CString& sLine) const { (pMod->*m_pFunc)(sLine); }
 
@@ -250,6 +253,7 @@ private:
 	ModCmdFunc m_pFunc;
 	CString m_sArgs;
 	CString m_sDesc;
+	CString m_sPermission;
 };
 
 /** The base class for your own ZNC modules.
@@ -817,7 +821,7 @@ public:
 	/// @return True if the command was successfully added.
 	bool AddCommand(const CModCommand& Command);
 	/// @return True if the command was successfully added.
-	bool AddCommand(const CString& sCmd, CModCommand::ModCmdFunc func, const CString& sArgs = "", const CString& sDesc = "");
+	bool AddCommand(const CString& sCmd, CModCommand::ModCmdFunc func, const CString& sArgs = "", const CString& sDesc = "", const CString& sPermission = "");
 	/// @return True if the command was successfully removed.
 	bool RemCommand(const CString& sCmd);
 	/// @return The CModCommand instance or NULL if none was found.
