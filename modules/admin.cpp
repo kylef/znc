@@ -97,6 +97,66 @@ class CAdminMod : public CModule {
 		PutModule("You can use $me as the user name for modifying your own user.");
 	}
 
+	void AddPerm(const CString& sLine) {
+		CString sUsername = sLine.Token(1);
+		CString sPermission = sLine.Token(2, true);
+		CUser* pUser = CZNC::Get().FindUser(sUsername);
+
+		if (!pUser) {
+			PutModule("Error: User not found: " + sUsername);
+			return;
+		}
+
+		pUser->Permit(sPermission);
+		PutModule(sUsername + " has been permitted " + sPermission);
+	}
+
+	void DelPerm(const CString& sLine) {
+		CString sUsername = sLine.Token(1);
+		CString sPermission = sLine.Token(2, true);
+		CUser* pUser = CZNC::Get().FindUser(sUsername);
+
+		if (!pUser) {
+			PutModule("Error: User not found: " + sUsername);
+			return;
+		}
+
+		PutModule(CString(pUser->Revoke(sPermission)) + " permissions removed from " + sUsername);
+	}
+
+	void ListPerms(const CString& sLine) {
+		CString sUsername = sLine.Token(1, true);
+		CUser* pUser;
+		CTable Table;
+
+		Table.AddColumn("Permission");
+
+		if (sUsername.empty()) {
+			pUser = m_pUser;
+		} else {
+			pUser = CZNC::Get().FindUser(sUsername);
+			if (!pUser) {
+				PutModule("Error: User not found: " + sUsername);
+				return;
+			}
+		}
+
+		if (pUser->IsAdmin()) {
+			PutModule(pUser->GetUserName() + " is an admin.");
+		}
+
+		const set<CString>& ssPermissions = pUser->GetPermissions();
+		if (ssPermissions.empty()) {
+			PutModule(pUser->GetUserName() + " does not have any permissions.");
+			return;
+		}
+
+		for (set<CString>::const_iterator it = ssPermissions.begin(); it != ssPermissions.end(); ++it) {
+			Table.AddRow();
+			Table.SetCell("Permission", *it);
+		}
+	}
+
 	CUser* GetUser(const CString& sUsername) {
 		if (sUsername.Equals("$me"))
 			return m_pUser;
@@ -835,6 +895,12 @@ public:
 	MODCONSTRUCTOR(CAdminMod) {
 		AddCommand("Help",         static_cast<CModCommand::ModCmdFunc>(&CAdminMod::PrintHelp),
 			"",                              "Generates this output");
+		AddCommand("AddPerm",       static_cast<CModCommand::ModCmdFunc>(&CAdminMod::AddPerm),
+			"username permission",           "Grant a user a new permission",  "users.perms");
+		AddCommand("DelPerm",         static_cast<CModCommand::ModCmdFunc>(&CAdminMod::DelPerm),
+			"username permission",           "Revoke a users permission",      "users.perms");
+		AddCommand("ListPerms",    static_cast<CModCommand::ModCmdFunc>(&CAdminMod::ListPerms),
+			"[username]",                    "Grant a user a new permission",  "users.perms");
 		AddCommand("Get",          static_cast<CModCommand::ModCmdFunc>(&CAdminMod::Get),
 			"variable [username]",           "Prints the variable's value for the given or current user");
 		AddCommand("Set",          static_cast<CModCommand::ModCmdFunc>(&CAdminMod::Set),
