@@ -910,13 +910,13 @@ public:
 		AddCommand("SetChan",      static_cast<CModCommand::ModCmdFunc>(&CAdminMod::SetChan),
 			"variable username chan value",  "Sets the variable's value for the given channel");
 		AddCommand("ListUsers",    static_cast<CModCommand::ModCmdFunc>(&CAdminMod::ListUsers),
-			"",                              "Lists users");
+			"",                              "Lists users",                     "users.list");
 		AddCommand("AddUser",      static_cast<CModCommand::ModCmdFunc>(&CAdminMod::AddUser),
-			"username password [ircserver]", "Adds a new user");
+			"username password [ircserver]", "Adds a new user",                 "users.add");
 		AddCommand("DelUser",      static_cast<CModCommand::ModCmdFunc>(&CAdminMod::DelUser),
-			"username",                      "Deletes a user");
+			"username",                      "Deletes a user",                  "users.del");
 		AddCommand("CloneUser",    static_cast<CModCommand::ModCmdFunc>(&CAdminMod::CloneUser),
-			"oldusername newusername",       "Clones a user");
+			"oldusername newusername",       "Clones a user",                   "users.add");
 		AddCommand("AddServer",    static_cast<CModCommand::ModCmdFunc>(&CAdminMod::AddServer),
 			"[username] server",             "Adds a new IRC server for the given or current user");
 		AddCommand("Reconnect",    static_cast<CModCommand::ModCmdFunc>(&CAdminMod::ReconnectUser),
