@@ -36,9 +36,9 @@ public:
 
 	MODCONSTRUCTOR(CCertMod) {
 		AddHelpCommand();
-		AddCommand("delete", static_cast<CModCommand::ModCmdFunc>(&CCertMod::Delete),
+		AddCommand("delete", static_cast<CCommand::ModCmdFunc>(&CCertMod::Delete),
 			"", "Delete the current certificate");
-		AddCommand("info", static_cast<CModCommand::ModCmdFunc>(&CCertMod::Info));
+		AddCommand("info", static_cast<CCommand::ModCmdFunc>(&CCertMod::Info));
 	}
 
 	virtual ~CCertMod() {}

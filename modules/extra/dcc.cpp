@@ -68,11 +68,11 @@ class CDCCMod : public CModule {
 public:
 	MODCONSTRUCTOR(CDCCMod) {
 		AddHelpCommand();
-		AddCommand("Send",          static_cast<CModCommand::ModCmdFunc>(&CDCCMod::SendCommand),
+		AddCommand("Send",          static_cast<CCommand::ModCmdFunc>(&CDCCMod::SendCommand),
 			"<nick> <file>");
-		AddCommand("Get",           static_cast<CModCommand::ModCmdFunc>(&CDCCMod::GetCommand),
+		AddCommand("Get",           static_cast<CCommand::ModCmdFunc>(&CDCCMod::GetCommand),
 			"<file>");
-		AddCommand("ListTransfers", static_cast<CModCommand::ModCmdFunc>(&CDCCMod::ListTransfersCommand));
+		AddCommand("ListTransfers", static_cast<CCommand::ModCmdFunc>(&CDCCMod::ListTransfersCommand));
 	}
 
 	virtual ~CDCCMod() {}

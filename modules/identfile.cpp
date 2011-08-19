@@ -19,11 +19,11 @@ class CIdentFileModule : public CGlobalModule {
 public:
 	GLOBALMODCONSTRUCTOR(CIdentFileModule) {
 		AddHelpCommand();
-		AddCommand("GetFile",   static_cast<CModCommand::ModCmdFunc>(&CIdentFileModule::GetFile));
-		AddCommand("SetFile",   static_cast<CModCommand::ModCmdFunc>(&CIdentFileModule::SetFile),
+		AddCommand("GetFile",   static_cast<CCommand::ModCmdFunc>(&CIdentFileModule::GetFile));
+		AddCommand("SetFile",   static_cast<CCommand::ModCmdFunc>(&CIdentFileModule::SetFile),
 			"<file>");
-		AddCommand("GetFormat", static_cast<CModCommand::ModCmdFunc>(&CIdentFileModule::GetFormat));
-		AddCommand("SetFormat", static_cast<CModCommand::ModCmdFunc>(&CIdentFileModule::SetFormat),
+		AddCommand("GetFormat", static_cast<CCommand::ModCmdFunc>(&CIdentFileModule::GetFormat));
+		AddCommand("SetFormat", static_cast<CCommand::ModCmdFunc>(&CIdentFileModule::SetFormat),
 			"<format>");
 	}
 

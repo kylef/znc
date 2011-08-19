@@ -816,41 +816,41 @@ class CAdminMod : public CModule {
 
 public:
 	MODCONSTRUCTOR(CAdminMod) {
-		AddCommand("Help",         static_cast<CModCommand::ModCmdFunc>(&CAdminMod::PrintHelp),
+		AddCommand("Help",         static_cast<CCommand::ModCmdFunc>(&CAdminMod::PrintHelp),
 			"",                              "Generates this output");
-		AddCommand("Get",          static_cast<CModCommand::ModCmdFunc>(&CAdminMod::Get),
+		AddCommand("Get",          static_cast<CCommand::ModCmdFunc>(&CAdminMod::Get),
 			"variable [username]",           "Prints the variable's value for the given or current user");
-		AddCommand("Set",          static_cast<CModCommand::ModCmdFunc>(&CAdminMod::Set),
+		AddCommand("Set",          static_cast<CCommand::ModCmdFunc>(&CAdminMod::Set),
 			"variable username value",       "Sets the variable's value for the given user (use $me for the current user)");
-		AddCommand("GetChan",      static_cast<CModCommand::ModCmdFunc>(&CAdminMod::GetChan),
+		AddCommand("GetChan",      static_cast<CCommand::ModCmdFunc>(&CAdminMod::GetChan),
 			"variable [username] chan",      "Prints the variable's value for the given channel");
-		AddCommand("SetChan",      static_cast<CModCommand::ModCmdFunc>(&CAdminMod::SetChan),
+		AddCommand("SetChan",      static_cast<CCommand::ModCmdFunc>(&CAdminMod::SetChan),
 			"variable username chan value",  "Sets the variable's value for the given channel");
-		AddCommand("ListUsers",    static_cast<CModCommand::ModCmdFunc>(&CAdminMod::ListUsers),
+		AddCommand("ListUsers",    static_cast<CCommand::ModCmdFunc>(&CAdminMod::ListUsers),
 			"",                              "Lists users");
-		AddCommand("AddUser",      static_cast<CModCommand::ModCmdFunc>(&CAdminMod::AddUser),
+		AddCommand("AddUser",      static_cast<CCommand::ModCmdFunc>(&CAdminMod::AddUser),
 			"username password [ircserver]", "Adds a new user");
-		AddCommand("DelUser",      static_cast<CModCommand::ModCmdFunc>(&CAdminMod::DelUser),
+		AddCommand("DelUser",      static_cast<CCommand::ModCmdFunc>(&CAdminMod::DelUser),
 			"username",                      "Deletes a user");
-		AddCommand("CloneUser",    static_cast<CModCommand::ModCmdFunc>(&CAdminMod::CloneUser),
+		AddCommand("CloneUser",    static_cast<CCommand::ModCmdFunc>(&CAdminMod::CloneUser),
 			"oldusername newusername",       "Clones a user");
-		AddCommand("AddServer",    static_cast<CModCommand::ModCmdFunc>(&CAdminMod::AddServer),
+		AddCommand("AddServer",    static_cast<CCommand::ModCmdFunc>(&CAdminMod::AddServer),
 			"[username] server",             "Adds a new IRC server for the given or current user");
-		AddCommand("Reconnect",    static_cast<CModCommand::ModCmdFunc>(&CAdminMod::ReconnectUser),
+		AddCommand("Reconnect",    static_cast<CCommand::ModCmdFunc>(&CAdminMod::ReconnectUser),
 			"username",                      "Cycles the user's IRC server connection");
-		AddCommand("Disconnect",   static_cast<CModCommand::ModCmdFunc>(&CAdminMod::DisconnectUser),
+		AddCommand("Disconnect",   static_cast<CCommand::ModCmdFunc>(&CAdminMod::DisconnectUser),
 			"username",                      "Disconnects the user from their IRC server");
-		AddCommand("LoadModule",   static_cast<CModCommand::ModCmdFunc>(&CAdminMod::LoadModuleForUser),
+		AddCommand("LoadModule",   static_cast<CCommand::ModCmdFunc>(&CAdminMod::LoadModuleForUser),
 			"username modulename",           "Loads a Module for a user");
-		AddCommand("UnLoadModule", static_cast<CModCommand::ModCmdFunc>(&CAdminMod::UnLoadModuleForUser),
+		AddCommand("UnLoadModule", static_cast<CCommand::ModCmdFunc>(&CAdminMod::UnLoadModuleForUser),
 			"username modulename",           "Removes a Module of a user");
-		AddCommand("ListMods",     static_cast<CModCommand::ModCmdFunc>(&CAdminMod::ListModuleForUser),
+		AddCommand("ListMods",     static_cast<CCommand::ModCmdFunc>(&CAdminMod::ListModuleForUser),
 			"username",                      "Get the list of modules for a user");
-		AddCommand("ListCTCPs",    static_cast<CModCommand::ModCmdFunc>(&CAdminMod::ListCTCP),
+		AddCommand("ListCTCPs",    static_cast<CCommand::ModCmdFunc>(&CAdminMod::ListCTCP),
 			"username",                      "List the configured CTCP replies");
-		AddCommand("AddCTCP",      static_cast<CModCommand::ModCmdFunc>(&CAdminMod::AddCTCP),
+		AddCommand("AddCTCP",      static_cast<CCommand::ModCmdFunc>(&CAdminMod::AddCTCP),
 			"username ctcp [reply]",         "Configure a new CTCP reply");
-		AddCommand("DelCTCP",      static_cast<CModCommand::ModCmdFunc>(&CAdminMod::DelCTCP),
+		AddCommand("DelCTCP",      static_cast<CCommand::ModCmdFunc>(&CAdminMod::DelCTCP),
 			"username ctcp",                 "Remove a CTCP reply");
 	}
 

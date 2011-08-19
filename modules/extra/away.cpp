@@ -187,23 +187,23 @@ public:
 		AddTimer(new CAwayJob(this, 60, 0, "AwayJob", "Checks for idle and saves messages every 1 minute"));
 
 		AddHelpCommand();
-		AddCommand("Away",         static_cast<CModCommand::ModCmdFunc>(&CAway::AwayCommand),
+		AddCommand("Away",         static_cast<CCommand::ModCmdFunc>(&CAway::AwayCommand),
 			"[-quiet]");
-		AddCommand("Back",         static_cast<CModCommand::ModCmdFunc>(&CAway::BackCommand),
+		AddCommand("Back",         static_cast<CCommand::ModCmdFunc>(&CAway::BackCommand),
 			"[-quiet]");
-		AddCommand("Messages",     static_cast<CModCommand::ModCmdFunc>(&CAway::BackCommand));
-		AddCommand("Delete",       static_cast<CModCommand::ModCmdFunc>(&CAway::DeleteCommand),
+		AddCommand("Messages",     static_cast<CCommand::ModCmdFunc>(&CAway::BackCommand));
+		AddCommand("Delete",       static_cast<CCommand::ModCmdFunc>(&CAway::DeleteCommand),
 			"delete <num|all>");
-		AddCommand("Save",         static_cast<CModCommand::ModCmdFunc>(&CAway::SaveCommand));
-		AddCommand("Ping",         static_cast<CModCommand::ModCmdFunc>(&CAway::PingCommand));
-		AddCommand("Pass",         static_cast<CModCommand::ModCmdFunc>(&CAway::PassCommand));
-		AddCommand("Show",         static_cast<CModCommand::ModCmdFunc>(&CAway::ShowCommand));
-		AddCommand("Replay",       static_cast<CModCommand::ModCmdFunc>(&CAway::ReplayCommand));
-		AddCommand("EnableTimer",  static_cast<CModCommand::ModCmdFunc>(&CAway::EnableTimerCommand));
-		AddCommand("DisableTimer", static_cast<CModCommand::ModCmdFunc>(&CAway::DisableTimerCommand));
-		AddCommand("SetTimer",     static_cast<CModCommand::ModCmdFunc>(&CAway::SetTimerCommand),
+		AddCommand("Save",         static_cast<CCommand::ModCmdFunc>(&CAway::SaveCommand));
+		AddCommand("Ping",         static_cast<CCommand::ModCmdFunc>(&CAway::PingCommand));
+		AddCommand("Pass",         static_cast<CCommand::ModCmdFunc>(&CAway::PassCommand));
+		AddCommand("Show",         static_cast<CCommand::ModCmdFunc>(&CAway::ShowCommand));
+		AddCommand("Replay",       static_cast<CCommand::ModCmdFunc>(&CAway::ReplayCommand));
+		AddCommand("EnableTimer",  static_cast<CCommand::ModCmdFunc>(&CAway::EnableTimerCommand));
+		AddCommand("DisableTimer", static_cast<CCommand::ModCmdFunc>(&CAway::DisableTimerCommand));
+		AddCommand("SetTimer",     static_cast<CCommand::ModCmdFunc>(&CAway::SetTimerCommand),
 			"<secs>");
-		AddCommand("Timer",        static_cast<CModCommand::ModCmdFunc>(&CAway::TimerCommand));
+		AddCommand("Timer",        static_cast<CCommand::ModCmdFunc>(&CAway::TimerCommand));
 
 	}
 

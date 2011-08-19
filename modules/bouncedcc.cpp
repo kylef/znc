@@ -136,9 +136,9 @@ public:
 
 	MODCONSTRUCTOR(CBounceDCCMod) {
 		AddHelpCommand();
-		AddCommand("ListDCCs", static_cast<CModCommand::ModCmdFunc>(&CBounceDCCMod::ListDCCsCommand),
+		AddCommand("ListDCCs", static_cast<CCommand::ModCmdFunc>(&CBounceDCCMod::ListDCCsCommand),
 			"", "List all active DCCs");
-		AddCommand("UseClientIP", static_cast<CModCommand::ModCmdFunc>(&CBounceDCCMod::UseClientIPCommand),
+		AddCommand("UseClientIP", static_cast<CCommand::ModCmdFunc>(&CBounceDCCMod::UseClientIPCommand),
 			"<true|false>");
 	}
 

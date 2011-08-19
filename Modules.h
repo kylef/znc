@@ -12,6 +12,7 @@
 #include "zncconfig.h"
 #include "WebModules.h"
 #include "main.h"
+#include "Command.h"
 #include <set>
 #include <queue>
 
@@ -220,58 +221,6 @@ protected:
 	CString         m_sWikiPage;
 	ModLoader       m_fLoader;
 	GlobalModLoader m_fGlobalLoader;
-};
-
-/** A helper class for handling commands in modules. */
-class CModCommand {
-public:
-	/// Type for the callback function that handles the actual command.
-	typedef void (CModule::*ModCmdFunc)(const CString& sLine);
-
-	/// Default constructor, needed so that this can be saved in a std::map.
-	CModCommand();
-
-	/** Construct a new CModCommand.
-	 * @param sCmd The name of the command.
-	 * @param func The command's callback function.
-	 * @param sArgs Help text describing the arguments to this command.
-	 * @param sDesc Help text describing what this command does.
-	 */
-	CModCommand(const CString& sCmd, ModCmdFunc func, const CString& sArgs, const CString& sDesc);
-
-	/** Copy constructor, needed so that this can be saved in a std::map.
-	 * @param other Object to copy from.
-	 */
-	CModCommand(const CModCommand& other);
-
-	/** Assignment operator, needed so that this can be saved in a std::map.
-	 * @param other Object to copy from.
-	 */
-	CModCommand& operator=(const CModCommand& other);
-
-	/** Initialize a CTable so that it can be used with AddHelp().
-	 * @param Table The instance of CTable to initialize.
-	 */
-	static void InitHelp(CTable& Table);
-
-	/** Add this command to the CTable instance.
-	 * @param Table Instance of CTable to which this should be added.
-	 * @warning The Table should be initialized via InitHelp().
-	 */
-	void AddHelp(CTable& Table) const;
-
-	const CString& GetCommand() const { return m_sCmd; }
-	ModCmdFunc GetFunction() const { return m_pFunc; }
-	const CString& GetArgs() const { return m_sArgs; }
-	const CString& GetDescription() const { return m_sDesc; }
-
-	void Call(CModule *pMod, const CString& sLine) const { (pMod->*m_pFunc)(sLine); }
-
-private:
-	CString m_sCmd;
-	ModCmdFunc m_pFunc;
-	CString m_sArgs;
-	CString m_sDesc;
 };
 
 /** The base class for your own ZNC modules.
@@ -810,15 +759,9 @@ public:
 	/// Register the "Help" command.
 	void AddHelpCommand();
 	/// @return True if the command was successfully added.
-	bool AddCommand(const CModCommand& Command);
-	/// @return True if the command was successfully added.
-	bool AddCommand(const CString& sCmd, CModCommand::ModCmdFunc func, const CString& sArgs = "", const CString& sDesc = "");
-	/// @return True if the command was successfully removed.
-	bool RemCommand(const CString& sCmd);
-	/// @return The CModCommand instance or NULL if none was found.
-	const CModCommand* FindCommand(const CString& sCmd) const;
+	bool AddCommand(const CString& sCmd, CCommand::CmdFunc func, const CString& sArgs = "", const CString& sDesc = "");
 	/** This function tries to dispatch the given command via the correct
-	 * instance of CModCommand. Before this can be called, commands have to
+	 * instance of CCommand. Before this can be called, commands have to
 	 * be added via AddCommand(). If no matching commands are found then
 	 * OnUnknownModCommand will be called.
 	 * @param sLine The command line to handle.
@@ -887,7 +830,7 @@ protected:
 private:
 	MCString           m_mssRegistry; //!< way to save name/value pairs. Note there is no encryption involved in this
 	VWebSubPages       m_vSubPages;
-	map<CString, CModCommand> m_mCommands;
+	CCommands          m_Commands;
 };
 
 class CModules : public vector<CModule*> {

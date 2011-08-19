@@ -71,14 +71,14 @@ class CNotesMod : public CModule {
 public:
 	MODCONSTRUCTOR(CNotesMod) {
 		AddHelpCommand();
-		AddCommand("List",   static_cast<CModCommand::ModCmdFunc>(&CNotesMod::ListCommand));
-		AddCommand("Add",    static_cast<CModCommand::ModCmdFunc>(&CNotesMod::AddNoteCommand),
+		AddCommand("List",   static_cast<CCommand::ModCmdFunc>(&CNotesMod::ListCommand));
+		AddCommand("Add",    static_cast<CCommand::ModCmdFunc>(&CNotesMod::AddNoteCommand),
 			"<key> <note>");
-		AddCommand("Del",    static_cast<CModCommand::ModCmdFunc>(&CNotesMod::DelCommand),
+		AddCommand("Del",    static_cast<CCommand::ModCmdFunc>(&CNotesMod::DelCommand),
 			"<key>",         "Delete a note");
-		AddCommand("Mod",    static_cast<CModCommand::ModCmdFunc>(&CNotesMod::ModCommand),
+		AddCommand("Mod",    static_cast<CCommand::ModCmdFunc>(&CNotesMod::ModCommand),
 			"<key> <note>",  "Modify a note");
-		AddCommand("Get",    static_cast<CModCommand::ModCmdFunc>(&CNotesMod::GetCommand),
+		AddCommand("Get",    static_cast<CCommand::ModCmdFunc>(&CNotesMod::GetCommand),
 			"<key>");
 	}
 

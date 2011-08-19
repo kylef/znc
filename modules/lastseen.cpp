@@ -63,7 +63,7 @@ private:
 public:
 	GLOBALMODCONSTRUCTOR(CLastSeenMod) {
 		AddHelpCommand();
-		AddCommand("Show", static_cast<CModCommand::ModCmdFunc>(&CLastSeenMod::ShowCommand));
+		AddCommand("Show", static_cast<CCommand::ModCmdFunc>(&CLastSeenMod::ShowCommand));
 	}
 
 	virtual ~CLastSeenMod() {}

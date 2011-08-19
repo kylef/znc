@@ -82,13 +82,13 @@ class CPerform : public CModule {
 public:
 	MODCONSTRUCTOR(CPerform) {
 		AddHelpCommand();
-		AddCommand("Add",     static_cast<CModCommand::ModCmdFunc>(&CPerform::Add),
+		AddCommand("Add",     static_cast<CCommand::ModCmdFunc>(&CPerform::Add),
 			"<command>");
-		AddCommand("Del",     static_cast<CModCommand::ModCmdFunc>(&CPerform::Del),
+		AddCommand("Del",     static_cast<CCommand::ModCmdFunc>(&CPerform::Del),
 			"<nr>");
-		AddCommand("List",    static_cast<CModCommand::ModCmdFunc>(&CPerform::List));
-		AddCommand("Execute", static_cast<CModCommand::ModCmdFunc>(&CPerform::Execute));
-		AddCommand("Swap",    static_cast<CModCommand::ModCmdFunc>(&CPerform::Swap),
+		AddCommand("List",    static_cast<CCommand::ModCmdFunc>(&CPerform::List));
+		AddCommand("Execute", static_cast<CCommand::ModCmdFunc>(&CPerform::Execute));
+		AddCommand("Swap",    static_cast<CCommand::ModCmdFunc>(&CPerform::Swap),
 			"<nr> <nr>");
 	}
 

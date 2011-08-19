@@ -123,11 +123,11 @@ private:
 public:
 	MODCONSTRUCTOR(CChanAttach) {
 		AddHelpCommand();
-		AddCommand("Add",    static_cast<CModCommand::ModCmdFunc>(&CChanAttach::HandleAdd),
+		AddCommand("Add",    static_cast<CCommand::ModCmdFunc>(&CChanAttach::HandleAdd),
 			"[!]<#chan> <host>", "Add an entry, use !#chan to negate and * for wildcards");
-		AddCommand("Del",    static_cast<CModCommand::ModCmdFunc>(&CChanAttach::HandleDel),
+		AddCommand("Del",    static_cast<CCommand::ModCmdFunc>(&CChanAttach::HandleDel),
 			"[!]<#chan> <host>", "Remove an entry, needs to be an exact match");
-		AddCommand("List",    static_cast<CModCommand::ModCmdFunc>(&CChanAttach::HandleList),
+		AddCommand("List",    static_cast<CCommand::ModCmdFunc>(&CChanAttach::HandleList),
 			"",           "List all entries");
 	}
 

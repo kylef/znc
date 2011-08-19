@@ -111,9 +111,9 @@ public:
 
 	MODCONSTRUCTOR(CSendRaw_Mod) {
 		AddHelpCommand();
-		AddCommand("Client",          static_cast<CModCommand::ModCmdFunc>(&CSendRaw_Mod::SendClient),
+		AddCommand("Client",          static_cast<CCommand::ModCmdFunc>(&CSendRaw_Mod::SendClient),
 			"[user] [data to send]",  "The data will be sent to the user's IRC client(s)");
-		AddCommand("Server",            static_cast<CModCommand::ModCmdFunc>(&CSendRaw_Mod::SendServer),
+		AddCommand("Server",            static_cast<CCommand::ModCmdFunc>(&CSendRaw_Mod::SendServer),
 			"[user] [data to send]",  "The data will be sent to the IRC server the user is connected to");
 	}
 };

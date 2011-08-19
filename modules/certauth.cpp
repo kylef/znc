@@ -17,12 +17,12 @@ class CSSLClientCertMod : public CGlobalModule {
 public:
 	GLOBALMODCONSTRUCTOR(CSSLClientCertMod) {
 		AddHelpCommand();
-		AddCommand("Add",  static_cast<CModCommand::ModCmdFunc>(&CSSLClientCertMod::HandleAddCommand),
+		AddCommand("Add",  static_cast<CCommand::ModCmdFunc>(&CSSLClientCertMod::HandleAddCommand),
 			"[pubkey]", "If pubkey is not provided will use the current key");
-		AddCommand("Del",  static_cast<CModCommand::ModCmdFunc>(&CSSLClientCertMod::HandleDelCommand),
+		AddCommand("Del",  static_cast<CCommand::ModCmdFunc>(&CSSLClientCertMod::HandleDelCommand),
 			"id");
-		AddCommand("List", static_cast<CModCommand::ModCmdFunc>(&CSSLClientCertMod::HandleListCommand));
-		AddCommand("Show", static_cast<CModCommand::ModCmdFunc>(&CSSLClientCertMod::HandleShowCommand),
+		AddCommand("List", static_cast<CCommand::ModCmdFunc>(&CSSLClientCertMod::HandleListCommand));
+		AddCommand("Show", static_cast<CCommand::ModCmdFunc>(&CSSLClientCertMod::HandleShowCommand),
 			"", "Print your current key");
 	}
 
