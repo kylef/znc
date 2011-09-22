@@ -104,12 +104,7 @@ void CIRCSock::ReadLine(const CString& sData) {
 		return;
 	} else if (sLine.Equals("ERROR ", false, 6)) {
 		//ERROR :Closing Link: nick[24.24.24.24] (Excess Flood)
-		CString sError(sLine.substr(6));
-
-		if (sError.Left(1) == ":") {
-			sError.LeftChomp();
-		}
-
+		CString sError(sLine.substr(6)).TrimPrefix_n();
 		m_pNetwork->PutStatus("Error from Server [" + sError + "]");
 		return;
 	}
@@ -117,7 +112,7 @@ void CIRCSock::ReadLine(const CString& sData) {
 	CString sCmd = sLine.Token(1);
 
 	if ((sCmd.length() == 3) && (isdigit(sCmd[0])) && (isdigit(sCmd[1])) && (isdigit(sCmd[2]))) {
-		CString sServer = sLine.Token(0); sServer.LeftChomp();
+		CString sServer = sLine.Token(0).LeftChomp_();
 		unsigned int uRaw = sCmd.ToUInt();
 		CString sNick = sLine.Token(2);
 		CString sRest = sLine.Token(3, true);
@@ -166,7 +161,7 @@ void CIRCSock::ReadLine(const CString& sData) {
 			case 10: { // :irc.server.com 010 nick <hostname> <port> :<info>
 				CString sHost = sRest.Token(0);
 				CString sPort = sRest.Token(1);
-				CString sInfo = sRest.Token(2, true).TrimPrefix_n(":");
+				CString sInfo = sRest.Token(2, true).TrimPrefix_n();
 				m_pNetwork->PutStatus("Server [" + m_pNetwork->GetCurrentServer()->GetString(false) +
 						"] redirects us to [" + sHost + ":" + sPort + "] with reason [" + sInfo + "]");
 				m_pNetwork->PutStatus("Perhaps you want to add it as a new server.");
@@ -278,11 +273,7 @@ void CIRCSock::ReadLine(const CString& sData) {
 				// If we don't know that channel, some client might have
 				// requested a /names for it and we really should forward this.
 				if (pChan) {
-					CString sNicks = sRest.Token(2, true);
-					if (sNicks.Left(1) == ":") {
-						sNicks.LeftChomp();
-					}
-
+					CString sNicks = sRest.Token(2, true).TrimPrefix_n();
 					pChan->AddNicks(sNicks);
 				}
 
@@ -363,17 +354,13 @@ void CIRCSock::ReadLine(const CString& sData) {
 			}
 		}
 	} else {
-		CNick Nick(sLine.Token(0).LeftChomp_n());
+		CNick Nick(sLine.Token(0).TrimPrefix_n());
 		sCmd = sLine.Token(1);
 		CString sRest = sLine.Token(2, true);
 
 		if (sCmd.Equals("NICK")) {
-			CString sNewNick = sRest;
+			CString sNewNick = sRest.TrimPrefix_n();
 			bool bIsVisible = false;
-
-			if (sNewNick.Left(1) == ":") {
-				sNewNick.LeftChomp();
-			}
 
 			vector<CChan*> vFoundChans;
 			const vector<CChan*>& vChans = m_pNetwork->GetChans();
@@ -403,12 +390,8 @@ void CIRCSock::ReadLine(const CString& sData) {
 				return;
 			}
 		} else if (sCmd.Equals("QUIT")) {
-			CString sMessage = sRest;
+			CString sMessage = sRest.TrimPrefix_n();
 			bool bIsVisible = false;
-
-			if (sMessage.Left(1) == ":") {
-				sMessage.LeftChomp();
-			}
 
 			// :nick!ident@host.com QUIT :message
 
@@ -441,11 +424,7 @@ void CIRCSock::ReadLine(const CString& sData) {
 				return;
 			}
 		} else if (sCmd.Equals("JOIN")) {
-			CString sChan = sRest.Token(0);
-			if (sChan.Left(1) == ":") {
-				sChan.LeftChomp();
-			}
-
+			CString sChan = sRest.Token(0).TrimPrefix_n();
 			CChan* pChan;
 
 			// Todo: use nick compare function
@@ -470,11 +449,8 @@ void CIRCSock::ReadLine(const CString& sData) {
 				}
 			}
 		} else if (sCmd.Equals("PART")) {
-			CString sChan = sRest.Token(0);
-			if (sChan.Left(1) == ":") {
-				sChan.LeftChomp();
-			}
-			CString sMsg = sRest.Token(1, true).TrimPrefix_n(":");
+			CString sChan = sRest.Token(0).TrimPrefix_n();
+			CString sMsg = sRest.Token(1, true).TrimPrefix_n();
 
 			CChan* pChan = m_pNetwork->FindChan(sChan);
 			bool bDetached = false;
@@ -621,11 +597,7 @@ void CIRCSock::ReadLine(const CString& sData) {
 		} else if (sCmd.Equals("PRIVMSG")) {
 			// :nick!ident@host.com PRIVMSG #chan :Message
 			CString sTarget = sRest.Token(0);
-			CString sMsg = sRest.Token(1, true);
-
-			if (sMsg.Left(1) == ":") {
-				sMsg.LeftChomp();
-			}
+			CString sMsg = sRest.Token(1, true).TrimPrefix_n();
 
 			if (sMsg.WildCmp("\001*\001")) {
 				sMsg.LeftChomp();
@@ -659,11 +631,7 @@ void CIRCSock::ReadLine(const CString& sData) {
 			}
 		} else if (sCmd.Equals("WALLOPS")) {
 			// :blub!dummy@rox-8DBEFE92 WALLOPS :this is a test
-			CString sMsg = sRest.Token(0, true);
-
-			if (sMsg.Left(1) == ":") {
-				sMsg.LeftChomp();
-			}
+			CString sMsg = sRest.Token(0, true).TrimPrefix_n();
 
 			if (!m_pNetwork->IsUserAttached()) {
 				m_pNetwork->AddQueryBuffer(":" + Nick.GetNickMask() + " WALLOPS ", ":" + m_pNetwork->GetUser()->AddTimestamp(sMsg), false);
@@ -689,9 +657,9 @@ void CIRCSock::ReadLine(const CString& sData) {
 				// of this reply.
 				CString sArgs;
 				if (sRest.Token(2) == "*") {
-					sArgs = sRest.Token(3, true).TrimPrefix_n(":");
+					sArgs = sRest.Token(3, true).TrimPrefix_n();
 				} else {
-					sArgs = sRest.Token(2, true).TrimPrefix_n(":");
+					sArgs = sRest.Token(2, true).TrimPrefix_n();
 				}
 
 				if (sSubCmd == "LS") {
@@ -1074,9 +1042,7 @@ void CIRCSock::ForwardRaw353(const CString& sLine) const {
 }
 
 void CIRCSock::ForwardRaw353(const CString& sLine, CClient* pClient) const {
-	CString sNicks = sLine.Token(5, true);
-	if (sNicks.Left(1) == ":")
-		sNicks.LeftChomp();
+	CString sNicks = sLine.Token(5, true).TrimPrefix_n();
 
 	if ((!m_bNamesx || pClient->HasNamesx()) && (!m_bUHNames || pClient->HasUHNames())) {
 		// Client and server have both the same UHNames and Namesx stuff enabled
