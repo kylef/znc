@@ -91,6 +91,7 @@ public:
 	void SetServerThrottle(unsigned int i) { m_sConnectThrottle.SetTTL(i*1000); }
 	void SetProtectWebSessions(bool b) { m_bProtectWebSessions = b; }
 	void SetConnectDelay(unsigned int i);
+	void SetMaxConnectionAttempts(unsigned int i) { m_uiMaxConnectionAttempts = i; }
 	// !Setters
 
 	// Getters
@@ -117,6 +118,7 @@ public:
 	unsigned int GetAnonIPLimit() const { return m_uiAnonIPLimit; }
 	unsigned int GetServerThrottle() const { return m_sConnectThrottle.GetTTL() / 1000; }
 	unsigned int GetConnectDelay() const { return m_uiConnectDelay; }
+	unsigned int GetMaxConnectionAttempts() const { return m_uiMaxConnectionAttempts; }
 	bool GetProtectWebSessions() const { return m_bProtectWebSessions; }
 	// !Getters
 
@@ -188,6 +190,7 @@ protected:
 	VCString               m_vsMotd;
 	CFile*                 m_pLockFile;
 	unsigned int           m_uiConnectDelay;
+	unsigned int           m_uiMaxConnectionAttempts;
 	unsigned int           m_uiAnonIPLimit;
 	unsigned int           m_uiMaxBufferSize;
 	CModules*              m_pModules;

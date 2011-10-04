@@ -29,6 +29,7 @@ CZNC::CZNC() {
 
 	m_pModules = new CModules();
 	m_uiConnectDelay = 5;
+	m_uiMaxConnectionAttempts = 5;
 	m_uiAnonIPLimit = 10;
 	m_uBytesRead = 0;
 	m_uBytesWritten = 0;
@@ -406,6 +407,7 @@ bool CZNC::WriteConfig() {
 
 	config.AddKeyValuePair("ConnectDelay", CString(m_uiConnectDelay));
 	config.AddKeyValuePair("ServerThrottle", CString(m_sConnectThrottle.GetTTL()/1000));
+	config.AddKeyValuePair("MaxConnectionAttempts", CString(GetMaxConnectionAttempts()));
 
 	if (!m_sPidFile.empty()) {
 		config.AddKeyValuePair("PidFile", m_sPidFile.FirstLine());
@@ -1155,6 +1157,8 @@ bool CZNC::DoRehash(CString& sError)
 		SetConnectDelay(sVal.ToUInt());
 	if (config.FindStringEntry("serverthrottle", sVal))
 		m_sConnectThrottle.SetTTL(sVal.ToUInt() * 1000);
+	if (config.FindStringEntry("maxconnectionattempts", sVal))
+		SetMaxConnectionAttempts(sVal.ToUInt());
 	if (config.FindStringEntry("anoniplimit", sVal))
 		m_uiAnonIPLimit = sVal.ToUInt();
 	if (config.FindStringEntry("maxbuffersize", sVal))
@@ -1741,13 +1745,13 @@ public:
 protected:
 	virtual void RunJob() {
 		list<CIRCNetwork*>& ConnectionQueue = CZNC::Get().GetConnectionQueue();
-
-		/* We store the end of the queue, so CIRCNetwork::Connect() can add
-		 * itself back to the queue and we wont end up in an infinite loop. */
-		list<CIRCNetwork*>::iterator end = ConnectionQueue.end();
 		list<CIRCNetwork*>::iterator it;
+		unsigned int uiAttempted, uiMaxAttempts;
 
-		for (it = ConnectionQueue.begin(); it != end;) {
+		uiMaxAttempts = CZNC::Get().GetMaxConnectionAttempts();
+		uiMaxAttempts = (ConnectionQueue.size() > uiMaxAttempts ? uiMaxAttempts : ConnectionQueue.size());
+
+		for (it = ConnectionQueue.begin(), uiAttempted = 0; uiAttempted < uiMaxAttempts; count++) {
 			CIRCNetwork *pNetwork = *it;
 
 			/* We must erase the network from the queue before we try to connect
