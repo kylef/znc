@@ -148,6 +148,22 @@ void CClient::ReadLine(const CString& sData) {
 		// Don't let the client talk to the server directly about CAP,
 		// we don't want anything enabled that ZNC does not support.
 		return;
+	} else if (sCommand.Equals("STARTTLS")) {
+#ifdef HAVE_LIBSSL
+		if (!GetSSL()) {
+			SetPemLocation(CZNC::Get().GetPemLocation());
+
+			if (StartTLS()) {
+				SetSSL(false);
+				PutClient(":irc.znc.in 670 " + m_sNick + " :STARTTLS successful, go ahead with TLS handshake");
+				SetSSL(true);
+				return;
+			}
+		}
+#endif
+
+		PutClient(":irc.znc.in 691 " + m_sNick + " :STARTTLS failure");
+		return;
 	}
 
 	if (!m_pUser) {
@@ -763,6 +779,11 @@ void CClient::HandleCap(const CString& sLine)
 	if (sSubCmd.Equals("LS")) {
 		SCString ssOfferCaps;
 		GLOBALMODULECALL(OnClientCapLs(this, ssOfferCaps), NOTHING);
+
+#ifdef HAVE_LIBSSL
+		ssOfferCaps.insert("tls");
+#endif
+
 		CString sRes;
 		for (SCString::iterator i = ssOfferCaps.begin(); i != ssOfferCaps.end(); ++i) {
 			sRes += *i + " ";
@@ -784,6 +805,13 @@ void CClient::HandleCap(const CString& sLine)
 				bVal = false;
 
 			bool bAccepted = ("multi-prefix" == sCap) || ("userhost-in-names" == sCap);
+
+#ifdef HAVE_LIBSSL
+			if (sCap == "tls") {
+				bAccepted = true;
+			}
+#endif
+
 			GLOBALMODULECALL(IsClientCapSupported(this, sCap, bVal), bAccepted = true);
 
 			if (!bAccepted) {
