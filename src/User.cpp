@@ -528,7 +528,7 @@ CString CUser::AddTimestamp(time_t tm, const CString& sStr) const {
 			// The Control+O key combination in mIRC inserts ascii character 15,
 			// which turns off all previous attributes, including color, bold, underline, and italics.
 			sRet += "\x0F ";
-			
+
 			sRet += szTimestamp;
 		}
 	}
@@ -617,7 +617,13 @@ bool CUser::Clone(const CUser& User, CString& sErrorRet, bool bCloneChans) {
 	// Networks
 	const vector<CIRCNetwork*>& vNetworks = User.GetNetworks();
 	for (a = 0; a < vNetworks.size(); a++) {
-		new CIRCNetwork(this, vNetworks[a], bCloneChans);
+		CIRCNetwork *pNetwork = FindNetwork(vNetworks[a]->GetName());
+
+		if (pNetwork) {
+			pNetwork->Clone(*vNetworks[a], bCloneChans);
+		} else {
+			new CIRCNetwork(this, *vNetworks[a], bCloneChans);
+		}
 	}
 	// !Networks
 
