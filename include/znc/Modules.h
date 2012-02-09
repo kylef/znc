@@ -384,6 +384,8 @@ public:
 	 *  @return true if you handled the page request or false if the name is to be checked
 	 *          against the list of registered SubPages and their permission settings.
 	 */
+	virtual CString GetWebPath();
+	virtual CString GetWebFilesPath();
 	virtual bool OnWebPreRequest(CWebSock& WebSock, const CString& sPageName);
 	/** If OnWebPreRequest returned false, and the RequiresAdmin/IsAdmin check has been passed,
 	 *  this method will be called with the page name. It will also be called for pages that
