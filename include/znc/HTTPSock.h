@@ -100,6 +100,7 @@ protected:
 	bool                     m_bGotHeader;
 	bool                     m_bLoggedIn;
 	bool                     m_bDone;
+	bool                     m_bKeepAlive;
 	unsigned long            m_uPostLen;
 	CString                  m_sPostData;
 	CString                  m_sURI;

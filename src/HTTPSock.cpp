@@ -34,6 +34,20 @@ void CHTTPSock::Init() {
 	m_uPostLen = 0;
 	EnableReadLine();
 	SetMaxBufferThreshold(10240);
+
+	m_sPostData = "";
+	m_sURI = "";
+	m_sDocRoot = "";
+	m_sContentType = "";
+	m_sIfNoneMatch = "";
+	m_sUser = "";
+	m_sPass = "";
+
+	m_msvsPOSTParams.clear();
+	m_msvsGETParams.clear();
+	m_msHeaders.clear();
+	m_msRequestCookies.clear();
+	m_msResponseCookies.clear();
 }
 
 CHTTPSock::~CHTTPSock() {}
@@ -85,6 +99,8 @@ void CHTTPSock::ReadLine(const CString& sData) {
 	CString sName = sLine.Token(0);
 
 	if (m_eMethod == UnknownMethod) {
+		m_bKeepAlive = false;
+
 		if (sName.Equals("GET")) {
 			m_eMethod = GetMethod;
 		} else if (sName.Equals("HEAD")) {
@@ -97,6 +113,11 @@ void CHTTPSock::ReadLine(const CString& sData) {
 
 		m_sURI = sLine.Token(1);
 		m_bHTTP10Client = sLine.Token(2).Equals("HTTP/1.0");
+
+		if (sLine.Token(2).Equals("HTTP/1.1")) {
+			m_bKeepAlive = true;
+		}
+
 		ParseURI();
 	} else if (sName.Equals("Cookie:")) {
 		VCString vsNV;
@@ -122,6 +143,8 @@ void CHTTPSock::ReadLine(const CString& sData) {
 	} else if (sName.Equals("If-None-Match:")) {
 		// this is for proper client cache support (HTTP 304) on static files:
 		m_sIfNoneMatch = sLine.Token(1, true);
+	} else if (sName.Equals("Connection:")) {
+		m_bKeepAlive = sLine.Token(1).Equals("Keep-Alive");
 	} else if (sLine.empty()) {
 		m_bGotHeader = true;
 
@@ -141,7 +164,9 @@ void CHTTPSock::ReadLine(const CString& sData) {
 				break;
 		}
 
-		DisableReadLine();
+		if (!m_bKeepAlive) {
+			DisableReadLine();
+		}
 	}
 }
 
@@ -184,7 +209,11 @@ void CHTTPSock::PrintPage(const CString& sPage) {
 		Write(sPage);
 	}
 
-	Close(Csock::CLT_AFTERWRITE);
+	if (m_bKeepAlive) {
+		Init();
+	} else {
+		Close(Csock::CLT_AFTERWRITE);
+	}
 }
 
 bool CHTTPSock::PrintFile(const CString& sFileName, CString sContentType) {
@@ -281,7 +310,11 @@ bool CHTTPSock::PrintFile(const CString& sFileName, CString sContentType) {
 
 	DEBUG("- ETag: [" << sETag << "] / If-None-Match [" << m_sIfNoneMatch << "]");
 
-	Close(Csock::CLT_AFTERWRITE);
+	if (m_bKeepAlive) {
+		Init();
+	} else {
+		Close(Csock::CLT_AFTERWRITE);
+	}
 
 	return true;
 }
@@ -465,7 +498,12 @@ bool CHTTPSock::PrintErrorPage(unsigned int uStatusId, const CString& sStatusMsg
 
 	PrintHeader(sPage.length(), "application/xhtml+xml; charset=utf-8", uStatusId, sStatusMsg);
 	Write(sPage);
-	Close(Csock::CLT_AFTERWRITE);
+
+	if (m_bKeepAlive) {
+		Init();
+	} else {
+		Close(Csock::CLT_AFTERWRITE);
+	}
 
 	return true;
 }
@@ -531,7 +569,11 @@ bool CHTTPSock::PrintHeader(off_t uContentLength, const CString& sContentType, u
 		Write(it->first + ": " + it->second + "\r\n");
 	}
 
-	Write("Connection: Close\r\n");
+	if (m_bKeepAlive) {
+		Write("Connection: Keep-Alive\r\n");
+	} else {
+		Write("Connection: Close\r\n");
+	}
 
 	Write("\r\n");
 	m_bSentHeader = true;
