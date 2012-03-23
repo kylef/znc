@@ -20,6 +20,7 @@ public:
 		UnknownMethod,
 		UnsupportedMethod,
 		GetMethod,
+		HeadMethod,
 		PostMethod
 	} EHTTPMethod;
 

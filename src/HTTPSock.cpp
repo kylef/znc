@@ -87,6 +87,8 @@ void CHTTPSock::ReadLine(const CString& sData) {
 	if (m_eMethod == UnknownMethod) {
 		if (sName.Equals("GET")) {
 			m_eMethod = GetMethod;
+		} else if (sName.Equals("HEAD")) {
+			m_eMethod = HeadMethod;
 		} else if (sName.Equals("POST")) {
 			m_eMethod = PostMethod;
 		} else {
@@ -128,12 +130,13 @@ void CHTTPSock::ReadLine(const CString& sData) {
 				m_sPostData = GetInternalReadBuffer();
 				CheckPost();
 				break;
+			case HeadMethod:
 			case GetMethod:
 				GetPage();
 				break;
 			case UnsupportedMethod:
 			default:
-				AddHeader("Allow", "GET, POST");
+				AddHeader("Allow", "GET, POST, HEAD");
 				PrintHeader(0, "", 405, "Invalid Method");
 				break;
 		}
@@ -177,7 +180,10 @@ void CHTTPSock::PrintPage(const CString& sPage) {
 		DEBUG("PrintPage(): Header was already sent");
 	}
 
-	Write(sPage);
+	if (m_eMethod != HeadMethod) {
+		Write(sPage);
+	}
+
 	Close(Csock::CLT_AFTERWRITE);
 }
 
