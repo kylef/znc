@@ -16,6 +16,13 @@ class CModule;
 
 class CHTTPSock : public CSocket {
 public:
+	typedef enum {
+		UnknownMethod,
+		UnsupportedMethod,
+		GetMethod,
+		PostMethod
+	} EHTTPMethod;
+
 	CHTTPSock(CModule *pMod);
 	CHTTPSock(CModule *pMod, const CString& sHostname, unsigned short uPort, int iTimeout = 60);
 	virtual ~CHTTPSock();
@@ -66,7 +73,7 @@ public:
 	const CString& GetPass() const;
 	const CString& GetParamString() const;
 	const CString& GetContentType() const;
-	bool IsPost() const;
+	bool IsPost() const { return m_eMethod == PostMethod; }
 	// !Getters
 
 	// Parameter access
@@ -87,10 +94,10 @@ protected:
 	void PrintPage(const CString& sPage);
 	void Init();
 
+	EHTTPMethod              m_eMethod;
 	bool                     m_bSentHeader;
 	bool                     m_bGotHeader;
 	bool                     m_bLoggedIn;
-	bool                     m_bPost;
 	bool                     m_bDone;
 	unsigned long            m_uPostLen;
 	CString                  m_sPostData;

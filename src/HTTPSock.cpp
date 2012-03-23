@@ -25,10 +25,10 @@ CHTTPSock::CHTTPSock(CModule *pMod, const CString& sHostname, unsigned short uPo
 }
 
 void CHTTPSock::Init() {
+	m_eMethod = UnknownMethod;
 	m_bSentHeader = false;
 	m_bGotHeader = false;
 	m_bLoggedIn = false;
-	m_bPost = false;
 	m_bDone = false;
 	m_bHTTP10Client = false;
 	m_uPostLen = 0;
@@ -39,7 +39,7 @@ void CHTTPSock::Init() {
 CHTTPSock::~CHTTPSock() {}
 
 void CHTTPSock::ReadData(const char* data, size_t len) {
-	if (!m_bDone && m_bGotHeader && m_bPost) {
+	if (!m_bDone && m_bGotHeader && IsPost()) {
 		m_sPostData.append(data, len);
 		CheckPost();
 	}
@@ -84,14 +84,17 @@ void CHTTPSock::ReadLine(const CString& sData) {
 
 	CString sName = sLine.Token(0);
 
-	if (sName.Equals("GET")) {
-		m_bPost = false;
+	if (m_eMethod == UnknownMethod) {
+		if (sName.Equals("GET")) {
+			m_eMethod = GetMethod;
+		} else if (sName.Equals("POST")) {
+			m_eMethod = PostMethod;
+		} else {
+			m_eMethod = UnsupportedMethod;
+		}
+
 		m_sURI = sLine.Token(1);
 		m_bHTTP10Client = sLine.Token(2).Equals("HTTP/1.0");
-		ParseURI();
-	} else if (sName.Equals("POST")) {
-		m_bPost = true;
-		m_sURI = sLine.Token(1);
 		ParseURI();
 	} else if (sName.Equals("Cookie:")) {
 		VCString vsNV;
@@ -120,11 +123,19 @@ void CHTTPSock::ReadLine(const CString& sData) {
 	} else if (sLine.empty()) {
 		m_bGotHeader = true;
 
-		if (m_bPost) {
-			m_sPostData = GetInternalReadBuffer();
-			CheckPost();
-		} else {
-			GetPage();
+		switch (m_eMethod) {
+			case PostMethod:
+				m_sPostData = GetInternalReadBuffer();
+				CheckPost();
+				break;
+			case GetMethod:
+				GetPage();
+				break;
+			case UnsupportedMethod:
+			default:
+				AddHeader("Allow", "GET, POST");
+				PrintHeader(0, "", 405, "Invalid Method");
+				break;
 		}
 
 		DisableReadLine();
@@ -415,10 +426,6 @@ const map<CString, VCString>& CHTTPSock::GetParams(bool bPost) const {
 	if (bPost)
 		return m_msvsPOSTParams;
 	return m_msvsGETParams;
-}
-
-bool CHTTPSock::IsPost() const {
-	return m_bPost;
 }
 
 bool CHTTPSock::PrintNotFound() {
