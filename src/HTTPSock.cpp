@@ -498,10 +498,6 @@ bool CHTTPSock::PrintHeader(off_t uContentLength, const CString& sContentType, u
 		m_sContentType = sContentType;
 	}
 
-	if (m_sContentType.empty()) {
-		m_sContentType = "application/xhtml+xml; charset=utf-8";
-	}
-
 	DEBUG("- " << uStatusId << " (" << sStatusMsg << ") [" << m_sContentType << "]");
 
 	Write("HTTP/" + CString(m_bHTTP10Client ? "1.0 " : "1.1 ") + CString(uStatusId) + " " + sStatusMsg + "\r\n");
@@ -509,8 +505,15 @@ bool CHTTPSock::PrintHeader(off_t uContentLength, const CString& sContentType, u
 	Write("Server: " + CZNC::GetTag(false) + "\r\n");
 	if (uContentLength > 0) {
 		Write("Content-Length: " + CString(uContentLength) + "\r\n");
+
+		if (m_sContentType.empty()) {
+			m_sContentType = "application/xhtml+xml; charset=utf-8";
+		}
 	}
-	Write("Content-Type: " + m_sContentType + "\r\n");
+
+	if (!m_sContentType.empty()) {
+		Write("Content-Type: " + m_sContentType + "\r\n");
+	}
 
 	MCString::iterator it;
 
