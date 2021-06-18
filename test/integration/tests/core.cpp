@@ -307,6 +307,57 @@ TEST_F(ZNCTest, StatusEchoMessage) {
     client3.ReadUntil(":*status!znc@znc.in PRIVMSG nick :Unknown command");
 }
 
+TEST_F(ZNCTest, ClientAndServerEchoMessage) {
+    auto znc = Run();
+    auto ircd = ConnectIRCd();
+    auto client = LoginClient();
+
+    client.Write("CAP REQ :echo-message");
+
+    // znc enables echo-message when offered
+    ircd.Write("CAP * LS :echo-message");
+    ircd.ReadUntil("CAP REQ :echo-message");
+    ircd.Write("CAP * ACK :echo-message");
+    ircd.ReadUntil("CAP END");
+
+    ircd.Write(":server 001 nick :Hello");
+
+    // client should get echo-msg
+    client.Write("PRIVMSG #example :hi");
+    ircd.Write(":nick!user@example.com PRIVMSG #example :hi");
+    client.ReadUntil(":nick!user@example.com PRIVMSG #example :hi");
+}
+
+TEST_F(ZNCTest, ServerEchoMessage) {
+    auto znc = Run();
+    auto ircd = ConnectIRCd();
+    auto client = LoginClient();
+
+    // enables echo-message when offered
+    ircd.Write("CAP * LS :echo-message");
+    ircd.ReadUntil("CAP REQ :echo-message");
+    ircd.Write("CAP * ACK :echo-message");
+    ircd.ReadUntil("CAP END");
+
+    ircd.Write(":server 001 nick :Hello");
+
+    client.Write("PRIVMSG #example :hi");
+    ircd.Write(":nick!user@example.com PRIVMSG #example :hi");
+    // FIXME client doesn't recv?
+}
+
+TEST_F(ZNCTest, ClientEchoMessage) {
+    auto znc = Run();
+    auto ircd = ConnectIRCd();
+    auto client = LoginClient();
+
+    client.Write("CAP REQ :echo-message");
+    ircd.Write(":server 001 nick :Hello");
+
+    client.Write("PRIVMSG #example :hi");
+    client.ReadUntil(":nick PRIVMSG #example :hi");
+}
+
 TEST_F(ZNCTest, MoveChannels) {
     auto znc = Run();
     auto ircd = ConnectIRCd();

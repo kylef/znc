@@ -153,6 +153,7 @@ class CIRCSock : public CIRCSocket {
     bool HasAccountTag() const { return m_bAccountTag; }
     bool HasExtendedJoin() const { return m_bExtendedJoin; }
     bool HasServerTime() const { return m_bServerTime; }
+    bool HasEchoMessage() const { return m_bEchoMessage; }
     const std::set<char>& GetUserModes() const {
         return m_scUserModes;
     }
@@ -211,6 +212,7 @@ class CIRCSock : public CIRCSocket {
     bool m_bAccountTag;
     bool m_bExtendedJoin;
     bool m_bServerTime;
+    bool m_bEchoMessage;
     CString m_sPerms;
     CString m_sPermModes;
     std::set<char> m_scUserModes;

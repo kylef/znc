@@ -70,6 +70,7 @@ CIRCSock::CIRCSock(CIRCNetwork* pNetwork)
       m_bAccountTag(false),
       m_bExtendedJoin(false),
       m_bServerTime(false),
+      m_bEchoMessage(false),
       m_sPerms("*!@%+"),
       m_sPermModes("qaohv"),
       m_scUserModes(),
@@ -382,6 +383,7 @@ bool CIRCSock::OnCapabilityMessage(CMessage& Message) {
             {"server-time", [this](bool bVal) { m_bServerTime = bVal; }},
             {"znc.in/server-time-iso",
              [this](bool bVal) { m_bServerTime = bVal; }},
+            {"echo-message", [this](bool bVal) { m_bEchoMessage = bVal; }},
         };
 
         if (sSubCmd == "LS") {
@@ -630,7 +632,7 @@ bool CIRCSock::OnNoticeMessage(CNoticeMessage& Message) {
         IRCSOCKMODULECALL(OnPrivNoticeMessage(Message), &bResult);
         if (bResult) return true;
 
-        if (!m_pNetwork->IsUserOnline()) {
+        if (!m_pNetwork->IsUserOnline() && !HasEchoMessage()) {
             // If the user is detached, add to the buffer
             CNoticeMessage Format;
             Format.Clone(Message);
@@ -649,8 +651,8 @@ bool CIRCSock::OnNoticeMessage(CNoticeMessage& Message) {
             IRCSOCKMODULECALL(OnChanNoticeMessage(Message), &bResult);
             if (bResult) return true;
 
-            if (!pChan->AutoClearChanBuffer() || !m_pNetwork->IsUserOnline() ||
-                pChan->IsDetached()) {
+            if ((!pChan->AutoClearChanBuffer() || !m_pNetwork->IsUserOnline() ||
+                pChan->IsDetached()) && !HasEchoMessage()) {
                 CNoticeMessage Format;
                 Format.Clone(Message);
                 Format.SetNick(_NAMEDFMT(Message.GetNick().GetNickMask()));
@@ -1071,8 +1073,8 @@ bool CIRCSock::OnTextMessage(CTextMessage& Message) {
         IRCSOCKMODULECALL(OnPrivTextMessage(Message), &bResult);
         if (bResult) return true;
 
-        if (!m_pNetwork->IsUserOnline() ||
-            !m_pNetwork->GetUser()->AutoClearQueryBuffer()) {
+        if ((!m_pNetwork->IsUserOnline() ||
+            !m_pNetwork->GetUser()->AutoClearQueryBuffer()) && !HasEchoMessage()) {
             const CNick& Nick = Message.GetNick();
             CQuery* pQuery = m_pNetwork->AddQuery(Nick.GetNick());
             if (pQuery) {
@@ -1092,8 +1094,8 @@ bool CIRCSock::OnTextMessage(CTextMessage& Message) {
             IRCSOCKMODULECALL(OnChanTextMessage(Message), &bResult);
             if (bResult) return true;
 
-            if (!pChan->AutoClearChanBuffer() || !m_pNetwork->IsUserOnline() ||
-                pChan->IsDetached()) {
+            if ((!pChan->AutoClearChanBuffer() || !m_pNetwork->IsUserOnline() ||
+                pChan->IsDetached()) && !HasEchoMessage()) {
                 CTextMessage Format;
                 Format.Clone(Message);
                 Format.SetNick(_NAMEDFMT(Message.GetNick().GetNickMask()));

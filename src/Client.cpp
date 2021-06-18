@@ -1151,8 +1151,12 @@ bool CClient::OnNoticeMessage(CNoticeMessage& Message) {
         }
 
         if (m_pNetwork) {
-            AddBuffer(Message);
-            EchoMessage(Message);
+            bool isEchoMessageEnabled = GetIRCSock() && GetIRCSock()->HasEchoMessage();
+            if (!isEchoMessageEnabled) {
+                AddBuffer(Message);
+                EchoMessage(Message);
+            }
+
             PutIRC(Message.ToString(CMessage::ExcludePrefix |
                                     CMessage::ExcludeTags));
         }
@@ -1268,8 +1272,12 @@ bool CClient::OnTextMessage(CTextMessage& Message) {
         }
 
         if (m_pNetwork) {
-            AddBuffer(Message);
-            EchoMessage(Message);
+            bool isEchoMessageEnabled = GetIRCSock() && GetIRCSock()->HasEchoMessage();
+            if (!isEchoMessageEnabled) {
+                AddBuffer(Message);
+                EchoMessage(Message);
+            }
+
             PutIRC(Message.ToString(CMessage::ExcludePrefix |
                                     CMessage::ExcludeTags));
         }
